@@ -1,8 +1,11 @@
 package travelsmart.shekharkg.com.travelsmart;
 
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -72,15 +75,23 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
   public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
     if(position == 0)
       return;
-    final String type = placeToVisit[position].toLowerCase().replace(" ", "_");
-    StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-    Location location = map.getMyLocation();
-    googlePlacesUrl.append("location=" + location.getLatitude() + "," + location.getLongitude());
-    googlePlacesUrl.append("&radius=" + "5000");
-    googlePlacesUrl.append("&types=" + type);
-    googlePlacesUrl.append("&sensor=true");
-    googlePlacesUrl.append("&key=" + apiKey);
-    new GetSearchResult(this).execute(googlePlacesUrl.toString());
+
+    ConnectivityManager connec = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+    if (connec != null &&   (connec.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED) ||
+        (connec.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED)) {
+      final String type = placeToVisit[position].toLowerCase().replace(" ", "_");
+      StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+      Location location = map.getMyLocation();
+      googlePlacesUrl.append("location=" + location.getLatitude() + "," + location.getLongitude());
+      googlePlacesUrl.append("&radius=" + "5000");
+      googlePlacesUrl.append("&types=" + type);
+      googlePlacesUrl.append("&sensor=true");
+      googlePlacesUrl.append("&key=" + apiKey);
+      new GetSearchResult(this).execute(googlePlacesUrl.toString());
+    }else{
+      Toast.makeText(this,"Check your connection!",Toast.LENGTH_LONG).show();
+      chooseCategory.setSelection(0);
+    }
   }
 
   @Override
