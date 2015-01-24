@@ -137,7 +137,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         marker.showInfoWindow();
       }
     }catch (Exception e){
-      Log.e("Exception",e.toString());
+      e.printStackTrace();
     }
   }
 
