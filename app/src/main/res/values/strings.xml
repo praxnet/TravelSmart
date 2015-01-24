@@ -2,7 +2,49 @@
 <resources>
 
     <string name="app_name">TravelSmart</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+
+    <string name="api_key">your_api_key</string>
+    <string name="api_key_search">your_api_key_for_search</string>
+
+    <string-array name="places_to_visit">
+        <item>Select a category</item>
+        <item>Airport</item>
+        <item>Amusement Park</item>
+        <item>Aquarium</item>
+        <item>Art Gallery</item>
+        <item>Book Store</item>
+        <item>Bowling Alley</item>
+        <item>Bus Station</item>
+        <item>Cafe</item>
+        <item>Car Dealer</item>
+        <item>Casino</item>
+        <item>Church</item>
+        <item>City Hall</item>
+        <item>Dentist</item>
+        <item>Doctor</item>
+        <item>Fire Station</item>
+        <item>Florist</item>
+        <item>Food</item>
+        <item>Gym</item>
+        <item>Hindu Temple</item>
+        <item>Hospital</item>
+        <item>Library</item>
+        <item>Lodging</item>
+        <item>Mosque</item>
+        <item>Movie Theater</item>
+        <item>Museum</item>
+        <item>Night Club</item>
+        <item>Park</item>
+        <item>Parking</item>
+        <item>Police</item>
+        <item>Post Office</item>
+        <item>Restaurant</item>
+        <item>Shopping Mall</item>
+        <item>Spa</item>
+        <item>Stadium</item>
+        <item>Train Station</item>
+        <item>University</item>
+        <item>Zoo</item>
+    </string-array>
 
 </resources>
