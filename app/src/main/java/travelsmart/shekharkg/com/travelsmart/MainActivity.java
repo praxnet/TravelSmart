@@ -1,6 +1,8 @@
 package travelsmart.shekharkg.com.travelsmart;
 
+import android.content.res.AssetFileDescriptor;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -14,20 +16,24 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Random;
+
 /**
  * Created by SKG on 1/23/2015.
  */
-public class MainActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, GoogleMap.OnMapLoadedCallback {
+public class MainActivity extends ActionBarActivity implements AdapterView.OnItemSelectedListener, GoogleMap.OnMapLoadedCallback, GoogleMap.OnInfoWindowClickListener {
 
   private Spinner chooseCategory;
   private GoogleMap map;
-  private String[] placeToVisit;
+  private String[] placeToVisit, audioFileNames;
   private String apiKey;
+  private MediaPlayer player;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +46,26 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
   private void populateData() {
     ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1,placeToVisit);
     chooseCategory.setAdapter(categoryAdapter);
-    chooseCategory.setOnItemSelectedListener(this);
     map.setMyLocationEnabled(true);
     map.setOnMapLoadedCallback(this);
+    map.setOnInfoWindowClickListener(this);
   }
 
   private void initView() {
     placeToVisit = getResources().getStringArray(R.array.places_to_visit);
-    apiKey = getResources().getString(R.string.api_key_search);
+    audioFileNames = getResources().getStringArray(R.array.audio_file_names);
+    apiKey = getResources().getString(R.string.api_key);
     chooseCategory = (Spinner) findViewById(R.id.chooseCategorySpinner);
     map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    if(player != null) {
+      player.stop();
+      player.release();
+    }
   }
 
   @Override
@@ -73,6 +89,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
 
   @Override
   public void onMapLoaded() {
+    chooseCategory.setOnItemSelectedListener(this);
     Location location = map.getMyLocation();
     if (location != null) {
       LatLng myLocation = new LatLng(location.getLatitude(),location.getLongitude());
@@ -97,14 +114,36 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 12));
       }
       for(int i=0; i< results.length(); i++){
-        String name = results.getJSONObject(i).getString("name");
+        String name = results.getJSONObject(i).getString("name") + " (Tap to listen Audio Review)";
         String lat = results.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getString("lat");
         String lng = results.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getString("lng");
-        map.addMarker(new MarkerOptions().position(new LatLng(Float.parseFloat(lat), Float.parseFloat(lng))).title(name));
+        Marker marker =  map.addMarker(new MarkerOptions().position(new LatLng(Float.parseFloat(lat), Float.parseFloat(lng))).title(name));
+        marker.showInfoWindow();
       }
     }catch (Exception e){
       Log.e("Exception",e.toString());
     }
   }
 
+  @Override
+  public void onInfoWindowClick(Marker marker) {
+    try {
+      if(player != null) {
+        player.stop();
+        player.release();
+      }
+
+      player = new MediaPlayer();
+      Random rn = new Random();
+      int index = rn.nextInt(6 - 1 + 1) + 1;
+      AssetFileDescriptor descriptor = getAssets().openFd(audioFileNames[index-1]);
+      player.setDataSource(descriptor.getFileDescriptor(), descriptor.getStartOffset(), descriptor.getLength());
+      descriptor.close();
+      player.prepare();
+      player.setVolume(1f, 1f);
+      player.start();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }
