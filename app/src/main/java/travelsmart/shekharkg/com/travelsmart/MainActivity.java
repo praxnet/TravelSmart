@@ -82,6 +82,11 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
       final String type = placeToVisit[position].toLowerCase().replace(" ", "_");
       StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
       Location location = map.getMyLocation();
+      if(location == null){
+        Toast.makeText(this,"Turn on Location sharing!",Toast.LENGTH_LONG).show();
+        chooseCategory.setSelection(0);
+        return;
+      }
       googlePlacesUrl.append("location=" + location.getLatitude() + "," + location.getLongitude());
       googlePlacesUrl.append("&radius=" + "5000");
       googlePlacesUrl.append("&types=" + type);
@@ -89,7 +94,7 @@ public class MainActivity extends ActionBarActivity implements AdapterView.OnIte
       googlePlacesUrl.append("&key=" + apiKey);
       new GetSearchResult(this).execute(googlePlacesUrl.toString());
     }else{
-      Toast.makeText(this,"Check your connection!",Toast.LENGTH_LONG).show();
+      Toast.makeText(this,"Check Internet connection!",Toast.LENGTH_LONG).show();
       chooseCategory.setSelection(0);
     }
   }
